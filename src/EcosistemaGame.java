@@ -1,20 +1,20 @@
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.Random;
 
 public class EcosistemaGame extends JDialog {
-    BiotopoEntity biotopoEntity = null;
-    Biosenosis biosenosis = null;
-    Biosenosis biosenosis2 = null;
-
-    BiotopoEntity biotopoEntity2 = null;
+    BiotopoEntity biotopoEntity = new BiotopoEntity("BiotopoEntity");
     File file = new File("biotopoEntity.txt");
+
+    Random random = new Random();
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JButton buttonCrear;
     private JButton buttonSave;
     private JButton buttonOpen;
+    private JTextPane textPane;
 
     public EcosistemaGame() {
         setContentPane(contentPane);
@@ -50,62 +50,113 @@ public class EcosistemaGame extends JDialog {
         buttonCrear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                biotopoEntity = new BiotopoEntity("BiotopoEntity 1");
-                biosenosis = new Biosenosis("Biosenosis 1");
+                Biosenosis biosenosis = new Biosenosis("Biosenosis " + random.nextInt(100));
                 biotopoEntity.getBiosenosis(biosenosis);
-                biosenosis2 = new Biosenosis("Biosenosis 2");
-                biotopoEntity.getBiosenosis(biosenosis2);
 
-                System.out.println(biotopoEntity);
+                //System.out.println(biotopoEntity);
+                textPane.setText(biotopoEntity.toString());
+
             }
         });
+
+
         buttonSave.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    FileOutputStream fileOutputStream = new FileOutputStream(file);
-                    ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-                    objectOutputStream.writeObject(biotopoEntity);
-                    objectOutputStream.close();
-                    fileOutputStream.close();
-                } catch (FileNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                JFileChooser fileChooser = new JFileChooser();
+                if (fileChooser.showSaveDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
+                    file = fileChooser.getSelectedFile();
+                    try {
+                        FileOutputStream fileOutputStream = new FileOutputStream(file);
+                        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+                        objectOutputStream.writeObject(biotopoEntity);
+                        objectOutputStream.close();
+                        fileOutputStream.close();
+                    } catch (FileNotFoundException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
+
             }
         });
         buttonOpen.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    FileInputStream fileInputStream = new FileInputStream(file);
-                    ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-                    biotopoEntity2 = (BiotopoEntity) objectInputStream.readObject();
-                    objectInputStream.close();
-                    fileInputStream.close();
-                } catch (FileNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                } catch (ClassNotFoundException ex) {
-                    throw new RuntimeException(ex);
+                JFileChooser fileChooser = new JFileChooser();
+                if (fileChooser.showOpenDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
+                    file = fileChooser.getSelectedFile();
+                    try {
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+                        biotopoEntity = (BiotopoEntity) objectInputStream.readObject();
+                        objectInputStream.close();
+                        fileInputStream.close();
+                    } catch (FileNotFoundException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (ClassNotFoundException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
 
-                System.out.println(biotopoEntity2);
+                textPane.setText(biotopoEntity.toString());
+                JOptionPane.showMessageDialog(null, biotopoEntity.toString());
 
             }
         });
+
+        recuperarStatus();
+    }
+
+    private void recuperarStatus() {
+        file = new File("biotopoEntity.txt");
+        if(file.exists()) {
+            try {
+                FileInputStream fileInputStream = new FileInputStream(file);
+                ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+                biotopoEntity = (BiotopoEntity) objectInputStream.readObject();
+                objectInputStream.close();
+                fileInputStream.close();
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            } catch (ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+            textPane.setText(biotopoEntity.toString());
+        }
+    }
+
+    private void grabarStatus(){
+
+        file = new File("biotopoEntity.txt");
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(biotopoEntity);
+            objectOutputStream.close();
+            fileOutputStream.close();
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private void onOK() {
         // add your code here
         dispose();
+        grabarStatus();
     }
 
     private void onCancel() {
         // add your code here if necessary
         dispose();
+        grabarStatus();
     }
 
     public static void main(String[] args) {

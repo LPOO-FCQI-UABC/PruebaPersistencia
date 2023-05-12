@@ -22,6 +22,7 @@ public class BiotopoEntity implements Serializable {
     public String toString() {
         return "BiotopoEntity{" +
                 "nombre='" + nombre + '\'' +
+                ", biosenosis=" + biosenosis +
                 '}';
     }
 }
