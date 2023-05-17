@@ -15,6 +15,7 @@ public class EcosistemaGame extends JDialog {
     private JButton buttonSave;
     private JButton buttonOpen;
     private JTextPane textPane;
+    private JButton newControlButton;
 
     public EcosistemaGame() {
         setContentPane(contentPane);
@@ -109,6 +110,13 @@ public class EcosistemaGame extends JDialog {
         });
 
         recuperarStatus();
+        newControlButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BiotopoControl biotopoControl = new BiotopoControl("BiotopoControl " + random.nextInt(100));
+                biotopoControl.start();
+            }
+        });
     }
 
     private void recuperarStatus() {
